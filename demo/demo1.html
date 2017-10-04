@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    body {
+      margin: 0;
+    }
+
+     ::selection {
+      background-color: transparent;
+    }
+
+    #colorPicker {
+      display: block;
+    }
+
+    p {
+      line-height: 25px;
+    }
+
+    #selected {
+      display: inline-block;
+      box-sizing: border-box;
+      vertical-align: top;
+      width: 25px;
+      height: 25px;
+      border: 1px solid #ccc;
+    }
+
+    input {
+      width: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="colorPicker"></canvas>
+  <p><b>当前选中的颜色: </b><span id="selected"></span><br>
+    <b>R: </b><input type="text" id="r" value="255"><br>
+    <b>G: </b><input type="text" id="g" value="255"><br>
+    <b>B: </b><input type="text" id="b" value="255"><br>
+    <b>hex: </b><input id="hex" value="#ffffff">
+  </p>
+
+  <script>
+    var canvas = document.getElementById('colorPicker');
+    var ctx = canvas.getContext('2d');
+    var arr = [];
+    var selected = document.getElementById('selected');
+    var r = document.getElementById('r');
+    var g = document.getElementById('g');
+    var b = document.getElementById('b');
+    var hex = document.getElementById('hex');
+
+    function getRgbArgs(color) {
+      var obj = {};
+      var rgb = color.split(',');
+      var r = parseInt(rgb[0].split('(')[1]);
+      var g = parseInt(rgb[1]);
+      var b = parseInt(rgb[2].split(')')[0]);
+
+      var hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+      obj = {
+        'r': r,
+        'b': b,
+        'g': g,
+        'hex': hex
+      };
+      return obj;
+    }
+
+    function draw() {
+      for (var i = 0; i < 6; i++) {
+        for (var j = 0; j < 6; j++) {
+          ctx.fillStyle = 'rgb(' + Math.floor(255 - 42.5 * i) + ',' + Math.floor(255 - 42.5 * j) + ',0)';
+          ctx.fillRect(25 * j, 25 * i, 25, 25);
+          arr.push({
+            x1: 25 * j,
+            y1: 25 * i,
+            x2: 25 * j + 25,
+            y2: 25 * i + 25,
+            color: 'rgb(' + Math.floor(255 - 42.5 * i) + ',' + Math.floor(255 - 42.5 * j) + ',0)'
+          });
+        }
+      }
+    }
+    draw();
+
+    canvas.addEventListener('dblclick', function (e) {
+      var x = e.clientX;
+      var y = e.clientY;
+      for (var i = 0; i < arr.length; i++) {
+        if (x >= arr[i].x1
+          && x < arr[i].x2
+          && y >= arr[i].y1
+          && y < arr[i].y2) {
+            var color = arr[i].color;
+            var colorArgs = getRgbArgs(color);
+            selected.style.backgroundColor = color;
+            r.value = colorArgs.r;
+            g.value = colorArgs.g;
+            b.value = colorArgs.b;
+            hex.value = colorArgs.hex;
+        }
+      }
+    }, true);
+  </script>
+</body>
+
+</html>
